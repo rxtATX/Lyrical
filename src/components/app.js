@@ -16,6 +16,10 @@ export default class App extends Component {
         artist: "Pink Floyd",
         lyrics: "So, so you think you can tell Heaven from Hell Blue skies from pain? Can you tell a green field From a cold steel rail? A smile from a veil? Do you think you can tell? And did they get you to trade Your heroes for ghosts? Hot ashes for trees? Hot air for a cool breeze? Cold comfort for change? And did you exchange A walk on part in the war For a leading role in a cage? How I wish, how I wish you were here We're just two lost souls Swimming in a fish bowl Year after year Running over the same old ground What have we found? The same old fears Wish you were here "
       }, {
+        title: "Triumph",
+        artist: "Wu-Tang Clan",
+        lyrics: "I bomb atomically, Socrates' philosophies and hypotheses can't define how I be dropping these mockeries, Lyrically perform armed robbery, Flee with the lottery, possibly they spotted me Battle-scarred Shogun, explosion when my pen hits tremendous Ultraviolet shine blind forensics, I inspect you through the future see millennium Killa Beez sold fifty gold, sixty platinum, Shackling the masses with drastic rap tactics Graphic displays melt the steel like blacksmiths"
+      }, {
         title: "test",
         artist: "test",
         lyrics: "this is a test"
