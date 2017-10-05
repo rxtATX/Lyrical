@@ -1,0 +1,50 @@
+:root {
+    --jumbo-height: 360px;
+}
+.jumbotron {
+    height: var(--jumbo-height);
+    width: 100%;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+section {
+    padding-top: 35vmax;
+    text-align: center;
+}
+.hidden > * {
+    display: none;
+    padding-bottom: 2vmax;
+}
+#percent {
+    padding: 2vmin 0 0;
+}
+.modal-body {
+    border: #eee .5vmin solid;
+    box-shadow: 0px 3px 4px 2px rgba(0,0,0,.5);
+    background-color: white;
+    position: relative;
+    height: 34vmin;
+    top: calc(35% - 16%);
+    left: calc(50% - 30vmin);
+    width: 60vmin;
+    border-radius: 5px;
+    flex: 1 1 auto;
+    padding: 15px;
+}
+.modal-body p,
+.modal-body h1 {
+    margin: 5rem auto 3rem;
+    text-align: center;
+}
+.modal-body .close {
+    background-color: transparent;
+    float: right;
+}
+.btn-primary {
+    width: 12vmin;
+    margin: 1rem calc(50% - 6vmin);
+}
+ul {
+    padding-top: calc(var(--jumbo-height) + 2vmin);
+}

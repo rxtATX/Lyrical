@@ -33,8 +33,8 @@ export default class App extends Component {
   componentDidMount() {
     var n = Math.floor(Math.random() * this.state.songs.length);
     this.setState({
-      words: this.state.songs[n].lyrics.replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().split(' '),
-      unique: [...new Set(this.state.songs[n].lyrics.toLowerCase().split(' '))],
+      words: this.state.songs[n].lyrics.replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().trim().split(' '),
+      unique: [...new Set(this.state.songs[n].lyrics.replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().trim().split(' '))],
       artist: this.state.songs[n].artist,
       title: this.state.songs[n].title,
       total: this.state.unique.length
@@ -44,10 +44,11 @@ export default class App extends Component {
   onGuess(input) {
     this.setState({ guess: input });
     for (let i = 0; i < this.state.unique.length; i++) {
-      if (input === this.state.unique[i]) {
+      if (input === this.state.unique[i] && this.state.guessed.indexOf(input) === -1) {
         var updateArray = this.state.guessed.concat(input)
         this.setState({
-          guessed: updateArray
+          guessed: updateArray,
+          total: Math.floor((updateArray.length / this.state.unique.length) * 100),
         });
       }
     }
@@ -63,6 +64,7 @@ export default class App extends Component {
           <Input
             runOnGuess={input => this.onGuess(input)}
           />
+          <p id="percent">{this.state.total}% Complete</p>
         </header>
         <WordBox
           songLyrics={this.state.words}

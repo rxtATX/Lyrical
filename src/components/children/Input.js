@@ -10,6 +10,7 @@ export default class Input extends Component {
     }
 
     onInputChange(input) {
+        input = input.toLowerCase();
         this.setState({ guess: input });
         this.props.runOnGuess(input);
     }
@@ -17,6 +18,9 @@ export default class Input extends Component {
     render() {
         return (
             <input
+                placeholder='Guess here'
+                onBlur={event => event.target.placeholder = 'Guess here'}
+                onFocus={event => event.target.placeholder = ''}
                 value={this.state.guess}
                 onChange={event => this.onInputChange(event.target.value)}
             />
