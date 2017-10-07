@@ -1,12 +1,24 @@
 import React, { Component } from 'react';
 import Input from './children/Input';
 import WordBox from './children/WordBox';
+import {
+  Modal,
+  ModalHeader,
+  ModalTitle,
+  ModalClose,
+  ModalBody,
+  ModalFooter
+} from 'react-modal-bootstrap';
 
 export default class App extends Component {
   constructor() {
     super();
 
+    this.hideModal = this.hideModal.bind(this);
+    this.openModal = this.openModal.bind(this);
+
     this.state = {
+      isOpen: false,
       songs: [{
         title: "Lucy in the Sky with Diamonds",
         artist: "The Beatles",
@@ -30,6 +42,25 @@ export default class App extends Component {
     };
   }
 
+  hideModal() {
+    this.setState({
+      isOpen: false
+    }).bind(this);
+  };
+
+  openModal() {
+    this.setState({
+      isOpen: true
+    });
+  };
+
+  componentDidUpdate() {
+    if (this.state.total === 100) {
+      this.openModal();
+      this.setState({ total: 0 })
+    }
+  }
+
   componentDidMount() {
     var n = Math.floor(Math.random() * this.state.songs.length);
     this.setState({
@@ -49,6 +80,7 @@ export default class App extends Component {
         this.setState({
           guessed: updateArray,
           total: Math.floor((updateArray.length / this.state.unique.length) * 100),
+          guess: ''
         });
       }
     }
@@ -63,6 +95,7 @@ export default class App extends Component {
           <p>Can you discover all the words to this mystery song?</p>
           <Input
             runOnGuess={input => this.onGuess(input)}
+            display={this.state.guess}
           />
           <p id="percent">{this.state.total}% Complete</p>
         </header>
@@ -70,6 +103,18 @@ export default class App extends Component {
           songLyrics={this.state.words}
           guessWord={this.state.guessed}
         />
+
+        <Modal isOpen={this.state.isOpen} onRequestHide={this.hideModal}>
+          <ModalHeader>
+            <ModalClose onClick={this.hideModal} />
+          </ModalHeader>
+          <ModalBody>
+            <h4>You guessed the song:</h4>
+            <h2>{this.state.title}</h2>
+            <h6>by</h6>
+            <h2>{this.state.artist}</h2>
+          </ModalBody>
+        </Modal>
       </content>
     );
   }

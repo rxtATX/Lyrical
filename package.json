@@ -24,6 +24,7 @@
     "lodash": "^3.10.1",
     "react": "^0.14.3",
     "react-dom": "^0.14.3",
+    "react-modal-bootstrap": "^1.1.1",
     "react-redux": "4.3.0",
     "react-router": "^2.0.1",
     "redux": "^3.0.4"
