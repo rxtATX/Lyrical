@@ -45,7 +45,7 @@ export default class App extends Component {
   hideModal() {
     this.setState({
       isOpen: false
-    }).bind(this);
+    });
   };
 
   openModal() {
