@@ -1,12 +1,8 @@
-:root {
-    --jumbo-height: 360px;
+header *:not(input) {
+    padding: 1rem 0 .5rem;
 }
-.jumbotron {
-    height: var(--jumbo-height);
-    width: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
+.container {
+    max-width: calc(100% - 5rem) !important;
 }
 section {
     padding-top: 35vmax;
@@ -16,6 +12,13 @@ section {
     display: none;
     padding-bottom: 2vmax;
 }
+.modal-header {
+    border-bottom: none !important;
+}
+.modal-body {
+    padding-top: 0 !important;
+    text-align: center;
+}
 #percent {
     padding: 2vmin 0 0;
 }
@@ -23,6 +26,6 @@ section {
     width: 12vmin;
     margin: 1rem calc(50% - 6vmin);
 }
-ul {
-    padding-top: calc(var(--jumbo-height) + 2vmin);
+li {
+    display: inline;
 }

@@ -1,14 +1,7 @@
 import React, { Component } from 'react';
 import Input from './children/Input';
 import WordBox from './children/WordBox';
-import {
-  Modal,
-  ModalHeader,
-  ModalTitle,
-  ModalClose,
-  ModalBody,
-  ModalFooter
-} from 'react-modal-bootstrap';
+import Modal from './children/Modal';
 
 export default class App extends Component {
   constructor() {
@@ -31,6 +24,10 @@ export default class App extends Component {
         title: "test",
         artist: "test",
         lyrics: "this is a test"
+      }, {
+        title: "Renegade",
+        artist: "Styx",
+        lyrics: "Oh, Mama, I'm in fear for my life from the long arm of the law Law man has put an end to my running and I'm so far from my home Oh, Mama I can hear you a- crying, you're so scared and all alone Hangman is coming down from the gallows and I don't have very long The jig is up, the news is out They've finally found me The renegade who had it made Retrieved for a bounty Never more to go astray This will be the end today Of the wanted man Oh, Mama, I've been years on the lam and had a high price on my head Lawman said, Get him dead or alive. Now it's for sure he'll see me dead Dear Mama, I can hear you crying, you're so scared and all alone Hangman is comin' down from the gallows and I don't have very long The jig is up, the news is out They've finally found me The renegade who had it made Retrieved for a bounty Never more to go astray The judge will have revenge today On the wanted man Oh, Mama, I'm in fear for my life from the long arm of the law Hangman is coming down from the gallows and I don't have very long The jig is up, the news is out They've finally found me The renegade who had it made Retrieved for a bounty Never more to go astray This will be the end today Of the wanted man The wanted man And I don't wanna go, oh, no Oh, Mama, don't let them take me No, no, no, I can't go Hey, hey"
       }],
       words: [],
       unique: [],
@@ -38,8 +35,27 @@ export default class App extends Component {
       title: '',
       total: '',
       guess: '',
-      guessed: []
+      guessed: [],
+      collapse: false,
+      timeLeft: 5 * 60
     };
+  }
+  songSearch() {
+    var data = null;
+
+    var xhr = new XMLHttpRequest();
+    xhr.withCredentials = true;
+
+    xhr.addEventListener("readystatechange", function () {
+      if (this.readyState === 4) {
+        console.log(this.responseText);
+      }
+    });
+
+    xhr.open("GET", "http://api.musixmatch.com/ws/1.1/chart.tracks.get?country=US&f_has_lyrics=1&apikey=75d336abfa6dcbbbffe3cf619840a0f8");
+    xhr.setRequestHeader("cache-control", "no-cache");
+
+    xhr.send(data);
   }
 
   hideModal() {
@@ -57,11 +73,17 @@ export default class App extends Component {
   componentDidUpdate() {
     if (this.state.total === 100) {
       this.openModal();
-      this.setState({ total: 0 })
+      this.setState({ total: '100' })
     }
   }
 
+  countdown() {
+    this.setState({ timeLeft: this.state.timeLeft-- })
+  }
+
   componentDidMount() {
+    this.songSearch();
+    this.countdown();
     var n = Math.floor(Math.random() * this.state.songs.length);
     this.setState({
       words: this.state.songs[n].lyrics.replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().trim().split(' '),
@@ -86,35 +108,40 @@ export default class App extends Component {
     }
   }
 
+  enterKeyEvent(charCode) {
+    if (charCode === 13) {
+      this.setState({ guess: '' });
+    }
+  }
+
   render() {
     return (
       <content className="container">
-        <header className="jumbotron text-center">
-          <h1>Lyrical</h1>
-          <h2>The game of musical recall</h2>
-          <p>Can you discover all the words to this mystery song?</p>
-          <Input
-            runOnGuess={input => this.onGuess(input)}
-            display={this.state.guess}
+        <div className="row">
+          <header className="col-md-3 text-center">
+            <h1>Lyrical</h1>
+            <h2>The game of musical recall</h2>
+            <p>Can you discover all the words to this mystery song?</p>
+            <Input
+              enterKeyEvent={charCode => this.enterKeyEvent(charCode)}
+              runOnGuess={input => this.onGuess(input)}
+              display={this.state.guess}
+            />
+            <p id="percent">{this.state.total}% Complete</p>
+          </header>
+          <div className="col-md-9">
+            <WordBox
+              songLyrics={this.state.words}
+              guessWord={this.state.guessed}
+            />
+          </div>
+          <Modal
+            title={this.state.title}
+            artist={this.state.artist}
+            isOpen={this.state.isOpen}
+            hideModal={this.hideModal}
           />
-          <p id="percent">{this.state.total}% Complete</p>
-        </header>
-        <WordBox
-          songLyrics={this.state.words}
-          guessWord={this.state.guessed}
-        />
-
-        <Modal isOpen={this.state.isOpen} onRequestHide={this.hideModal}>
-          <ModalHeader>
-            <ModalClose onClick={this.hideModal} />
-          </ModalHeader>
-          <ModalBody>
-            <h4>You guessed the song:</h4>
-            <h2>{this.state.title}</h2>
-            <h6>by</h6>
-            <h2>{this.state.artist}</h2>
-          </ModalBody>
-        </Modal>
+        </div>
       </content>
     );
   }

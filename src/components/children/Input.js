@@ -7,8 +7,14 @@ export default class Input extends Component {
     }
 
     onInputChange(input) {
-        input = input.toLowerCase();
+        input = input.trim().toLowerCase();
         this.props.runOnGuess(input);
+    }
+
+    enterKey(event) {
+        if (event.nativeEvent.charCode === 13) {
+            this.props.enterKeyEvent(13);
+        }
     }
 
     render() {
@@ -19,6 +25,7 @@ export default class Input extends Component {
                 onFocus={event => event.target.placeholder = ''}
                 value={this.props.display}
                 onChange={event => this.onInputChange(event.target.value)}
+                onKeyUp={this.enterKey}
             />
         )
     }
