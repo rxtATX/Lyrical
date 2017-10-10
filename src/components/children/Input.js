@@ -12,8 +12,8 @@ export default class Input extends Component {
     }
 
     enterKey(event) {
-        if (event.nativeEvent.charCode === 13) {
-            this.props.enterKeyEvent(13);
+        if (event.keyCode === 13) {
+            this.props.enterKeyEvent(event.keyCode);
         }
     }
 
@@ -25,7 +25,7 @@ export default class Input extends Component {
                 onFocus={event => event.target.placeholder = ''}
                 value={this.props.display}
                 onChange={event => this.onInputChange(event.target.value)}
-                onKeyUp={this.enterKey}
+                onKeyUp={event => this.enterKey(event.nativeEvent)}
             />
         )
     }
