@@ -97,6 +97,11 @@ export default class App extends Component {
     }
   }
 
+  handleClickEvent(e) {
+    e.preventDefault();
+    window.location.reload(true);
+  }
+
   render() {
     return (
       <content className="container">
@@ -116,6 +121,7 @@ export default class App extends Component {
               val={5}
               timeOut={bool => this.timeOut(bool)}
             />
+            <button type="button" className="btn btn-default" onClick={(e) => this.handleClickEvent(e)}>New Song?</button>
           </header>
           <div className="col-md-9">
             <WordBox
@@ -125,6 +131,7 @@ export default class App extends Component {
             />
           </div>
           <Modal
+            handleClickEvent={(e) => this.handleClickEvent(e)}
             title={this.state.title}
             artist={this.state.artist}
             isOpen={this.state.isOpen}

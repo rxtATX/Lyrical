@@ -14,6 +14,7 @@ export default class Input extends Component {
         super(props);
 
     }
+
     render() {
         return (
             <Modal isOpen={this.props.isOpen} onRequestHide={this.props.hideModal}>
@@ -26,6 +27,9 @@ export default class Input extends Component {
                     <h6>by</h6>
                     <h2>{this.props.artist}</h2>
                 </ModalBody>
+                <ModalFooter>
+                    <button type="button" className="btn btn-primary" onClick={(e) => this.props.handleClickEvent(e)}>Play again?</button>
+                </ModalFooter>
             </Modal>
         )
     }
