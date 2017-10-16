@@ -21,7 +21,7 @@ export default class Input extends Component {
                     <ModalClose onClick={this.props.hideModal} />
                 </ModalHeader>
                 <ModalBody>
-                    <h4>You guessed the song:</h4>
+                    {/* <h4>You guessed the song:</h4> */}
                     <h2>{this.props.title}</h2>
                     <h6>by</h6>
                     <h2>{this.props.artist}</h2>

@@ -3,22 +3,41 @@ import React, { Component } from 'react'
 export default class Counter extends Component {
     constructor(props) {
         super(props);
-        this.state = { counter: props.val }
+        this.state = {
+            currentCount: props.val,
+            intervalId: undefined
+        }
+
+        this.timer = this.timer.bind(this);
+        this.determineTimeout = this.determineTimeout.bind(this);
+
+    }
+
+    componentDidMount() {
+        var intervalId = setInterval(this.timer, 1000);
+        this.setState({ intervalId });
+    }
+
+    componentDidUpdate() {
+        this.determineTimeout();
+    }
+
+    timer() {
+        this.setState({
+            currentCount: this.state.currentCount - 1
+        });
+    }
+
+    determineTimeout() {
+        if (this.state.currentCount === 0) {
+            clearInterval(this.state.intervalId)
+            this.props.timeOut(true);
+        }
     }
 
     render() {
-        var x = this;
-        var { counter } = this.state;
-        setTimeout(function () {
-            if (counter > 0) {
-                x.setState({ counter: counter - 1 });
-            }
-        }, 1000);
-        if (counter === 0) {
-            return <div>Time remaining: {counter}</div>;
-            this.props.openModal();
-        } else {
-            return <div>Time remaining: {counter}</div>;
-        }
+        return (
+            <div>Time left: {this.state.currentCount}</div>
+        )
     }
 }

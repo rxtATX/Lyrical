@@ -10,6 +10,7 @@ export default class App extends Component {
 
     this.hideModal = this.hideModal.bind(this);
     this.openModal = this.openModal.bind(this);
+    this.timeOut = this.timeOut.bind(this);
 
     this.state = {
       isOpen: false,
@@ -17,6 +18,10 @@ export default class App extends Component {
         title: "test",
         artist: "test",
         lyrics: "this is a test"
+      }, {
+        title: "If I Fell",
+        artist: "The Beatles",
+        lyrics: "If I fell in love with you Would you promise to be true And help me understand because I've been in love before And I found that love was more Than just holding hands If I give my heart to you I must be sure From the very start That you would love me more than her If I trust in you oh please Don't run and hide If I love you too oh please Don't hurt my pride like her because I couldn't stand the pain And I would be sad if our new love was in vain So I hope you see that I Would love to love you And that she will cry When she learns we are two because I couldn't stand the pain And I would be sad if our new love was in vain So I hope you see that I Would love to love you And that she will cry When she learns we are two If I fell in love with you"
       }],
       words: [],
       unique: [],
@@ -41,13 +46,17 @@ export default class App extends Component {
     });
   };
 
+  // search() {
+  //   return fetch('http://api.musixmatch.com/ws/1.1/chart.tracks.get?country=US&f_has_lyrics=1&apikey=75d336abfa6dcbbbffe3cf619840a0f8')
+  //     .then(response => console.log(response))
+  //     .then(data => console.log(data));
+  // }
+
   componentDidUpdate() {
     if (this.state.total === 100) {
       this.openModal();
+      clearInterval(1);
       this.setState({ total: '100' })
-    }
-    if (this.state.timeLeft === 0) {
-      clearInterval(countdown);
     }
   }
 
@@ -82,10 +91,10 @@ export default class App extends Component {
     }
   }
 
-  timeOut() {
-    this.setState({
-      isOpen: true
-    });
+  timeOut(bool) {
+    if (bool) {
+      this.openModal();
+    }
   }
 
   render() {
@@ -103,10 +112,14 @@ export default class App extends Component {
             />
             <p id="percent">{this.state.total}% Complete</p>
             <p>{this.state.timeLeft}</p>
-            <Counter val={5} openModal={this.timeOut} />
+            <Counter
+              val={5}
+              timeOut={bool => this.timeOut(bool)}
+            />
           </header>
           <div className="col-md-9">
             <WordBox
+              isGameOver={this.state.isOpen}
               songLyrics={this.state.words}
               guessWord={this.state.guessed}
             />
