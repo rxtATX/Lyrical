@@ -13,19 +13,11 @@ export default class App extends Component {
 
     this.state = {
       isOpen: false,
-      songs: [{
-        title: "test",
-        artist: "test",
-        lyrics: "this is a test"
-      }, {
-        title: "If I Fell",
-        artist: "The Beatles",
-        lyrics: "If I fell in love with you Would you promise to be true And help me understand because I've been in love before And I found that love was more Than just holding hands If I give my heart to you I must be sure From the very start That you would love me more than her If I trust in you oh please Don't run and hide If I love you too oh please Don't hurt my pride like her because I couldn't stand the pain And I would be sad if our new love was in vain So I hope you see that I Would love to love you And that she will cry When she learns we are two because I couldn't stand the pain And I would be sad if our new love was in vain So I hope you see that I Would love to love you And that she will cry When she learns we are two If I fell in love with you"
-      }],
+      title: '',
+      artist: '',
+      lyrics: '',
       words: [],
       unique: [],
-      artist: '',
-      title: '',
       total: '',
       guess: '',
       guessed: [],
@@ -47,11 +39,35 @@ export default class App extends Component {
     });
   };
 
-  // search() {
-  //   return fetch('http://api.musixmatch.com/ws/1.1/chart.tracks.get?country=US&f_has_lyrics=1&apikey=75d336abfa6dcbbbffe3cf619840a0f8')
-  //     .then(response => console.log(response))
-  //     .then(data => console.log(data));
-  // }
+  componentWillMount() {
+    this.search();
+  }
+
+  search() {
+    $.getJSON('http://api.musixmatch.com/ws/1.1/chart.tracks.get?country=US&f_has_lyrics=1&apikey=75d336abfa6dcbbbffe3cf619840a0f8')
+      .then((response) => {
+        let n = Math.floor(Math.random() * response.message.body.track_list.length);
+
+        this.setState({
+          artist: response.message.body.track_list[n].track.artist_name,
+          title: response.message.body.track_list[n].track.track_name
+        });
+
+        $.getJSON('http://api.musixmatch.com/ws/1.1/track.lyrics.get?apikey=75d336abfa6dcbbbffe3cf619840a0f8&track_id=' + response.message.body.track_list[n].track.track_id)
+          .then((newResponse) => {
+            if (newResponse.message.body.lyrics.explicit === 1) {
+              this.search();
+            } else {
+              this.setState({
+                lyrics: newResponse.message.body.lyrics.lyrics_body,
+                words: newResponse.message.body.lyrics.lyrics_body.toLowerCase().trim().split(' '),
+                unique: [...new Set(newResponse.message.body.lyrics.lyrics_body.toLowerCase().trim().split(' '))],
+                // total: this.state.unique.length
+              });
+            }
+          });
+      });
+  }
 
   componentDidUpdate() {
     if (this.state.total === 100) {
@@ -62,12 +78,10 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    var n = Math.floor(Math.random() * this.state.songs.length);
+    console.log(this.state.lyrics);
     this.setState({
-      words: this.state.songs[n].lyrics.replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().trim().split(' '),
-      unique: [...new Set(this.state.songs[n].lyrics.replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().trim().split(' '))],
-      artist: this.state.songs[n].artist,
-      title: this.state.songs[n].title,
+      words: this.state.lyrics.replace(/(this lyrics is not for commercial use.+$)/g, '').replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().trim().split(' '),
+      unique: [...new Set(this.state.lyrics.replace(/(this lyrics is not for commercial use.+$)/g, '').replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().trim().split(' '))],
       total: this.state.unique.length
     });
   }
