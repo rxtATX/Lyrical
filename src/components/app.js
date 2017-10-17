@@ -10,7 +10,6 @@ export default class App extends Component {
 
     this.hideModal = this.hideModal.bind(this);
     this.openModal = this.openModal.bind(this);
-    this.timeOut = this.timeOut.bind(this);
 
     this.state = {
       isOpen: false,
@@ -30,7 +29,8 @@ export default class App extends Component {
       total: '',
       guess: '',
       guessed: [],
-      collapse: false
+      collapse: false,
+      isGameOver: false
     };
   }
 
@@ -42,7 +42,8 @@ export default class App extends Component {
 
   openModal() {
     this.setState({
-      isOpen: true
+      isOpen: true,
+      isGameOver: true
     });
   };
 
@@ -91,12 +92,6 @@ export default class App extends Component {
     }
   }
 
-  timeOut(bool) {
-    if (bool) {
-      this.openModal();
-    }
-  }
-
   handleClickEvent(e) {
     e.preventDefault();
     window.location.reload(true);
@@ -119,13 +114,13 @@ export default class App extends Component {
             <p>{this.state.timeLeft}</p>
             <Counter
               val={5}
-              timeOut={bool => this.timeOut(bool)}
+              timeOut={this.openModal}
             />
             <button type="button" className="btn btn-default" onClick={(e) => this.handleClickEvent(e)}>New Song?</button>
           </header>
           <div className="col-md-9">
             <WordBox
-              isGameOver={this.state.isOpen}
+              isGameOver={this.state.isGameOver}
               songLyrics={this.state.words}
               guessWord={this.state.guessed}
             />
