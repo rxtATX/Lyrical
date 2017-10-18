@@ -21,7 +21,6 @@ export default class App extends Component {
       total: '',
       guess: '',
       guessed: [],
-      collapse: false,
       isGameOver: false
     };
   }
@@ -44,7 +43,7 @@ export default class App extends Component {
   }
 
   search() {
-    $.getJSON('http://api.musixmatch.com/ws/1.1/chart.tracks.get?country=US&f_has_lyrics=1&apikey=75d336abfa6dcbbbffe3cf619840a0f8')
+    $.getJSON('http://api.musixmatch.com/ws/1.1/chart.tracks.get?page_size=40&country=US&f_has_lyrics=1&apikey=75d336abfa6dcbbbffe3cf619840a0f8')
       .then((response) => {
         let n = Math.floor(Math.random() * response.message.body.track_list.length);
 
@@ -55,16 +54,21 @@ export default class App extends Component {
 
         $.getJSON('http://api.musixmatch.com/ws/1.1/track.lyrics.get?apikey=75d336abfa6dcbbbffe3cf619840a0f8&track_id=' + response.message.body.track_list[n].track.track_id)
           .then((newResponse) => {
-            if (newResponse.message.body.lyrics.explicit === 1) {
+            console.log(newResponse.message.body.lyrics.lyrics_body);
+            if (newResponse.message.body.lyrics.explicit === 1 || newResponse.message.body.lyrics.lyrics_language_description !== "English") {
               this.search();
             } else {
               this.setState({
-                lyrics: newResponse.message.body.lyrics.lyrics_body,
-                words: newResponse.message.body.lyrics.lyrics_body.toLowerCase().trim().split(' '),
-                unique: [...new Set(newResponse.message.body.lyrics.lyrics_body.toLowerCase().trim().split(' '))],
-                // total: this.state.unique.length
+                lyrics: newResponse.message.body.lyrics.lyrics_body.toLowerCase().replace(/(\r\n|\r|\n\n|\n)/gm, ' ').replace(/this lyrics is not for commercial use.*/gm, '')
               });
             }
+          }).then(() => {
+            let lyrics = this.state.lyrics.replace(/[^a-zA-Z0-9\s\\']|(\b[a|o]{2,}h{1,}\b)/gm, '').trim().split(' ');
+            this.setState({
+              words: lyrics,
+              unique: [...new Set(lyrics)],
+              total: this.state.unique.length
+            })
           });
       });
   }
@@ -75,15 +79,6 @@ export default class App extends Component {
       clearInterval(1);
       this.setState({ total: '100' })
     }
-  }
-
-  componentDidMount() {
-    console.log(this.state.lyrics);
-    this.setState({
-      words: this.state.lyrics.replace(/(this lyrics is not for commercial use.+$)/g, '').replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().trim().split(' '),
-      unique: [...new Set(this.state.lyrics.replace(/(this lyrics is not for commercial use.+$)/g, '').replace(/[^a-zA-Z0-9\s']/g, '').replace(/(\b[a|o]{1,}h{1,}\b)/g, '').toLowerCase().trim().split(' '))],
-      total: this.state.unique.length
-    });
   }
 
   onGuess(input) {
@@ -127,7 +122,7 @@ export default class App extends Component {
             <p id="percent">{this.state.total}% Complete</p>
             <p>{this.state.timeLeft}</p>
             <Counter
-              val={5}
+              val={5 * 60}
               timeOut={this.openModal}
             />
             <button type="button" className="btn btn-default" onClick={(e) => this.handleClickEvent(e)}>New Song?</button>

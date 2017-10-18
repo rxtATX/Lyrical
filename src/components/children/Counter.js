@@ -30,7 +30,7 @@ export default class Counter extends Component {
 
     convertTime(totalSeconds) {
         if (typeof (totalSeconds) === 'string') {
-            return '00:00';
+            return '0:00';
         } else {
             var minutes = Math.floor(totalSeconds / 60);
             var seconds = totalSeconds - minutes * 60;
@@ -38,7 +38,7 @@ export default class Counter extends Component {
                 seconds = '0' + seconds;
             }
             if (minutes === 0 && seconds === 0) {
-                minutes = '00';
+                minutes = '0';
                 seconds = '00'
             }
             return minutes + ':' + seconds;
@@ -50,7 +50,7 @@ export default class Counter extends Component {
             clearInterval(this.state.intervalId)
             this.props.timeOut();
             this.setState({
-                currentCount: '00:00'
+                currentCount: '0:00'
             });
         }
     }
