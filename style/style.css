@@ -29,3 +29,7 @@ section {
 li {
     display: inline;
 }
+
+.red-text {
+    color: red;
+}

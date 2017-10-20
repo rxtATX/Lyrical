@@ -26,6 +26,7 @@ export default class Input extends Component {
                     <h2>{this.props.title}</h2>
                     <h6>by</h6>
                     <h2>{this.props.artist}</h2>
+                    <a href={this.props.url} target="_blank">View lyrics on source page.</a>
                 </ModalBody>
                 <ModalFooter>
                     <button type="button" className="btn btn-primary" onClick={(e) => this.props.handleClickEvent(e)}>Play again?</button>

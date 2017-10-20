@@ -12,16 +12,18 @@ export default class App extends Component {
     this.openModal = this.openModal.bind(this);
 
     this.state = {
+      isGameOver: false,
       isOpen: false,
+      url: '',
       title: '',
       artist: '',
       lyrics: '',
       words: [],
       unique: [],
-      total: '',
-      guess: '',
       guessed: [],
-      isGameOver: false
+      guess: '',
+      total: '',
+      hintsUsed: 0
     };
   }
 
@@ -59,11 +61,12 @@ export default class App extends Component {
               this.search();
             } else {
               this.setState({
-                lyrics: newResponse.message.body.lyrics.lyrics_body.toLowerCase().replace(/(\r\n|\r|\n\n|\n)/gm, ' ').replace(/this lyrics is not for commercial use.*/gm, '')
+                url: newResponse.message.body.lyrics.backlink_url,
+                lyrics: newResponse.message.body.lyrics.lyrics_body.toLowerCase().replace(/(\r\n|\r|\n\n|\n)/gm, ' ').replace(/this lyrics is not for commercial use.*/gm, '').replace(/in'[^ain't]/gm, 'ing').replace(/'bout/gm, ' about').replace(/'round/gm, ' around').replace(/'cause/gm, 'because').replace(/'em/gm, 'them')
               });
             }
           }).then(() => {
-            let lyrics = this.state.lyrics.replace(/[^a-zA-Z0-9\s\\']|(\b[a|o]{2,}h{1,}\b)/gm, '').trim().split(' ');
+            let lyrics = this.state.lyrics.replace(/[^a-zA-Z0-9\s\\'\-]|(\b[a|o]{2,}h{1,}\b)/gm, '').trim().split(' ');
             this.setState({
               words: lyrics,
               unique: [...new Set(lyrics)],
@@ -101,6 +104,28 @@ export default class App extends Component {
     }
   }
 
+  getHint(e) {
+    if (this.state.hintsUsed === 0) {
+      let longest = this.state.unique[0];
+      for (let i = 0; i < this.state.unique.length; i++) {
+        if (longest.length < this.state.unique[i].length) {
+          longest = this.state.unique[i];
+        }
+      }
+      if ($.inArray(longest, this.state.guessed) === -1) {
+        this.onGuess(longest);
+      }
+      this.setState({ hintsUsed: 1 })
+    } else if (this.state.hintsUsed === 1) {
+      //Show artist?
+      this.setState({ hintsUsed: 2 })
+    } else if (this.state.hintsUsed === 2) {
+      console.log(this.refs)
+      this.setState({ hintsUsed: 3 })
+    }
+  }
+
+
   handleClickEvent(e) {
     e.preventDefault();
     window.location.reload(true);
@@ -122,9 +147,10 @@ export default class App extends Component {
             <p id="percent">{this.state.total}% Complete</p>
             <p>{this.state.timeLeft}</p>
             <Counter
-              val={5 * 60}
+              val={5}
               timeOut={this.openModal}
             />
+            <button ref="hint" type="button" className="btn btn-default" onClick={(e) => this.getHint(e)}>Need a hint?</button>
             <button type="button" className="btn btn-default" onClick={(e) => this.handleClickEvent(e)}>New Song?</button>
           </header>
           <div className="col-md-9">
@@ -138,6 +164,7 @@ export default class App extends Component {
             handleClickEvent={(e) => this.handleClickEvent(e)}
             title={this.state.title}
             artist={this.state.artist}
+            url={this.state.url}
             isOpen={this.state.isOpen}
             hideModal={this.hideModal}
           />
