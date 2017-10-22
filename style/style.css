@@ -21,15 +21,20 @@ section {
 }
 #percent {
     padding: 2vmin 0 0;
+    margin-bottom: 0;
 }
 .btn-primary {
     width: 12vmin;
     margin: 1rem calc(50% - 6vmin);
 }
 li {
+    font-size: 1.6rem;
     display: inline;
 }
-
 .red-text {
     color: red;
+}
+
+header button{
+    margin: .5rem 0;
 }

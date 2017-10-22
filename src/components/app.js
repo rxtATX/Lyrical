@@ -4,12 +4,15 @@ import WordBox from './children/WordBox';
 import Modal from './children/Modal';
 import Counter from './children/Counter';
 
+import key from '../../keys.js';
+
 export default class App extends Component {
   constructor() {
     super();
 
     this.hideModal = this.hideModal.bind(this);
     this.openModal = this.openModal.bind(this);
+    this.mode = this.mode.bind(this);
 
     this.state = {
       isGameOver: false,
@@ -45,7 +48,7 @@ export default class App extends Component {
   }
 
   search() {
-    $.getJSON('http://api.musixmatch.com/ws/1.1/chart.tracks.get?page_size=40&country=US&f_has_lyrics=1&apikey=75d336abfa6dcbbbffe3cf619840a0f8')
+    $.getJSON('http://api.musixmatch.com/ws/1.1/chart.tracks.get?page_size=40&country=US&f_has_lyrics=1&apikey=' + key.key)
       .then((response) => {
         let n = Math.floor(Math.random() * response.message.body.track_list.length);
 
@@ -62,7 +65,7 @@ export default class App extends Component {
             } else {
               this.setState({
                 url: newResponse.message.body.lyrics.backlink_url,
-                lyrics: newResponse.message.body.lyrics.lyrics_body.toLowerCase().replace(/(\r\n|\r|\n\n|\n)/gm, ' ').replace(/this lyrics is not for commercial use.*/gm, '').replace(/in'[^ain't]/gm, 'ing').replace(/'bout/gm, ' about').replace(/'round/gm, ' around').replace(/'cause/gm, 'because').replace(/'em/gm, 'them')
+                lyrics: newResponse.message.body.lyrics.lyrics_body.toLowerCase().replace(/(\r\n|\r|\n\n|\n)/gm, ' ').replace(/this lyrics is not for commercial use.*/gm, '').replace(/in'[^ain't]/gm, 'ing ').replace(/'bout/gm, 'about').replace(/'round/gm, 'around').replace(/'cause/gm, 'because').replace(/'em/gm, 'them')
               });
             }
           }).then(() => {
@@ -77,6 +80,10 @@ export default class App extends Component {
   }
 
   componentDidUpdate() {
+    if (this.state.isGameOver === true) {
+      this.refs.hint.style.display = 'block';
+      this.refs.hint.outerHTML = `<p refs="hint" >Hints Used: ${this.state.hintsUsed}`;
+    }
     if (this.state.total === 100) {
       this.openModal();
       clearInterval(1);
@@ -104,25 +111,75 @@ export default class App extends Component {
     }
   }
 
+  mode(arr) {
+    var numMapping = {};
+    var greatestFreq = 0;
+    var mode;
+    arr.forEach(function findMode(number) {
+      numMapping[number] = (numMapping[number] || 0) + 1;
+
+      if (greatestFreq < numMapping[number]) {
+        greatestFreq = numMapping[number];
+        mode = number;
+      }
+    });
+    return mode;
+  }
+
+  // infrequent(arr) {
+  //   var newArr = [].concat(arr);
+  //   var temp;
+  //   var index;
+  //   for (let i = 0; i <= arr.length - 1; i++) {
+  //     if (newArr.length > 1) {
+  //       console.log(this)
+  //       temp = this.mode(newArr);
+  //       console.log(temp);
+  //       index = newArr.indexOf(temp);
+  //       newArr.splice(index, 0);
+  //       console.log(newArr)
+  //     }
+  //   }
+  //   return newArr[0]; //This is only returning the final index of the newArr.
+  // }
+
   getHint(e) {
-    if (this.state.hintsUsed === 0) {
-      let longest = this.state.unique[0];
-      for (let i = 0; i < this.state.unique.length; i++) {
-        if (longest.length < this.state.unique[i].length) {
-          longest = this.state.unique[i];
+    if (this.state.isGameOver === false) {
+
+      if (this.state.hintsUsed === 0) { //reveal first word in song
+        this.onGuess(this.state.words[0]);
+
+        this.setState({ hintsUsed: 1 })
+        this.refs.hint.classList.add("btn-warning")
+
+      } else if (this.state.hintsUsed === 1) { //reveal longest word in song
+        let longest = this.state.unique[0];
+        for (let i = 0; i < this.state.unique.length; i++) {
+          if (longest.length < this.state.unique[i].length) {
+            longest = this.state.unique[i];
+          }
         }
+        if ($.inArray(longest, this.state.guessed) === -1) {
+          this.onGuess(longest);
+        }
+
+        this.setState({ hintsUsed: 2 })
+        this.refs.hint.classList.add("btn-danger")
+        this.refs.hint.innerHTML = "Last Hint"
+
+      } else if (this.state.hintsUsed === 2) {  //reveal most common word in song
+        var commonest = this.mode(this.state.words);
+        if (this.state.guessed.indexOf(commonest) === -1) {
+          this.onGuess(commonest);
+        } else {
+          this.state.words[(this.state.words.indexOf(commonest) + 1)];
+        }
+
+        this.setState({ hintsUsed: 3 })
+        this.refs.hint.style.display = 'none';
       }
-      if ($.inArray(longest, this.state.guessed) === -1) {
-        this.onGuess(longest);
-      }
-      this.setState({ hintsUsed: 1 })
-    } else if (this.state.hintsUsed === 1) {
-      //Show artist?
-      this.setState({ hintsUsed: 2 })
-    } else if (this.state.hintsUsed === 2) {
-      console.log(this.refs)
-      this.setState({ hintsUsed: 3 })
     }
+
   }
 
 
@@ -145,12 +202,11 @@ export default class App extends Component {
               display={this.state.guess}
             />
             <p id="percent">{this.state.total}% Complete</p>
-            <p>{this.state.timeLeft}</p>
             <Counter
-              val={5}
+              val={30}
               timeOut={this.openModal}
             />
-            <button ref="hint" type="button" className="btn btn-default" onClick={(e) => this.getHint(e)}>Need a hint?</button>
+            <button ref="hint" type="button" className="btn btn-success" onClick={(e) => this.getHint(e)}>Need a hint?</button>
             <button type="button" className="btn btn-default" onClick={(e) => this.handleClickEvent(e)}>New Song?</button>
           </header>
           <div className="col-md-9">
